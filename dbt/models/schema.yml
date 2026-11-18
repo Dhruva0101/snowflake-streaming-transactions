@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_card_txns
+    description: Deduplicated, cleaned card transactions.
+    columns:
+      - name: txn_id
+        tests: [not_null, unique]
+      - name: amount
+        tests: [not_null]
+      - name: currency
+        tests:
+          - accepted_values:
+              values: ["USD", "CAD", "GBP", "INR", "MXN"]
+
+  - name: fct_transactions
+    description: One row per transaction.
+    columns:
+      - name: txn_id
+        tests: [not_null, unique]
+      - name: card_id
+        tests:
+          - relationships:
+              to: ref('dim_card')
+              field: card_id
+      - name: merchant_key
+        tests:
+          - relationships:
+              to: ref('dim_merchant')
+              field: merchant_key
+
+  - name: dim_card
+    columns:
+      - name: card_id
+        tests: [not_null, unique]
+
+  - name: dim_merchant
+    columns:
+      - name: merchant_key
+        tests: [not_null, unique]

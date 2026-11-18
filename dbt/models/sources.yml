@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw
+    database: FIN_DEMO
+    schema: RAW
+    tables:
+      - name: CARD_TXNS
+        loaded_at_field: LOADED_AT
+        freshness:
+          warn_after: {count: 1, period: hour}
+          error_after: {count: 24, period: hour}

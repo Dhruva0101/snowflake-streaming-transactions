@@ -1,0 +1,40 @@
+# Step 4: deploy the consumer to a local cluster (kind or minikube).
+# Create the secret first (never commit real values):
+#   kubectl create secret generic snowflake-creds \
+#     --from-literal=SNOWFLAKE_ACCOUNT=... --from-literal=SNOWFLAKE_USER=... \
+#     --from-literal=SNOWFLAKE_PASSWORD=...
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: txn-consumer-config
+data:
+  KAFKA_BOOTSTRAP: "kafka:29092"
+  BATCH_SIZE: "500"
+  MAX_WAIT_SECONDS: "10"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: txn-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: txn-consumer
+  template:
+    metadata:
+      labels:
+        app: txn-consumer
+    spec:
+      containers:
+        - name: consumer
+          image: txn-consumer:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: txn-consumer-config
+            - secretRef:
+                name: snowflake-creds
+          resources:
+            requests: {cpu: "100m", memory: "128Mi"}
+            limits: {cpu: "500m", memory: "512Mi"}

@@ -1,0 +1,14 @@
+# Copy to ~/.dbt/profiles.yml and fill in. Never commit real credentials.
+fin_demo:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: ACCOUNTADMIN
+      warehouse: XS_WH
+      database: FIN_DEMO
+      schema: DEV
+      threads: 4
